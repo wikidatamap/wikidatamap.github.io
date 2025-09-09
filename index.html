@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wikidata Konumları Haritası - Toolforge</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #006699 0%, #004466 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .wikimedia-badge {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 10px;
+            margin: 10px auto;
+            display: inline-block;
+            backdrop-filter: blur(10px);
+        }
+        
+        .controls {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .query-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            align-items: end;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        input, select, textarea {
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #006699;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #006699, #004466);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .templates {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .template-card {
+            background: white;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .template-card:hover {
+            border-color: #006699;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .template-title {
+            font-weight: bold;
+            color: #006699;
+            margin-bottom: 5px;
+        }
+        
+        .template-desc {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .template-example {
+            font-size: 12px;
+            background: #f8f9fa;
+            padding: 5px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
+        .property-suggestions {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .property-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .property-item {
+            background: white;
+            border: 1px solid #e1e5e9;
+            border-radius: 6px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .property-item:hover {
+            border-color: #006699;
+            transform: translateX(5px);
+        }
+        
+        .property-code {
+            font-weight: bold;
+            color: #006699;
+        }
+        
+        .stats {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            color: white;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            text-align: center;
+            margin: 5px;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        #map {
+            height: 600px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            margin: 20px 0;
+        }
+        
+        .error {
+            background: #ff6b6b;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .success {
+            background: #51cf66;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .query-section {
+                grid-template-columns: 1fr;
+            }
+            .template-grid {
+                grid-template-columns: 1fr;
+            }
+            .property-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌍 Wikidata Konumları Haritası</h1>
+            <p>Wikidata'da sorgu yaparak konumları harita üzerinde görselleştirin</p>
+            <div class="wikimedia-badge">
+                <small>🏛️ Wikimedia Toolforge üzerinde barındırılmaktadır</small>
+            </div>
+        </div>
+        
+        <div id="stats" class="stats" style="display: none;">
+            <div class="stat-item">
+                <div class="stat-number" id="totalResults">0</div>
+                <div class="stat-label">Toplam Sonuç</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="mappedResults">0</div>
+                <div class="stat-label">Haritada Gösterilen</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="queryTime">0</div>
+                <div class="stat-label">Sorgu Süresi (sn)</div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="templates">
+                <h3>📋 Hazır Sorgu Şablonları</h3>
+                <div class="template-grid">
+                    <div class="template-card" onclick="loadTemplate('castles')">
+                        <div class="template-title">🏰 Kaleler</div>
+                        <div class="template-desc">Türkiye'deki tarihi kaleler</div>
+                        <div class="template-example">Q23413 (castle)</div>
+                    </div>
+                    <div class="template-card" onclick="loadTemplate('museums')">
+                        <div class="template-title">🏛️ Müzeler</div>
+                        <div class="template-desc">Türkiye'deki müzeler</div>
+                        <div class="template-example">Q33506 (museum)</div>
+                    </div>
+                    <div class="template-card" onclick="loadTemplate('unesco')">
+                        <div class="template-title">🌍 UNESCO Mirası</div>
+                        <div class="template-desc">Dünya mirası alanları</div>
+                        <div class="template-example">Q9259 (World Heritage Site)</div>
+                    </div>
+                    <div class="template-card" onclick="loadTemplate('universities')">
+                        <div class="template-title">🎓 Üniversiteler</div>
+                        <div class="template-desc">Türkiye'deki üniversiteler</div>
+                        <div class="template-example">Q3918 (university)</div>
+                    </div>
+                    <div class="template-card" onclick="loadTemplate('airports')">
+                        <div class="template-title">✈️ Havalimanları</div>
+                        <div class="template-desc">Türkiye'deki havalimanları</div>
+                        <div class="template-example">Q1248784 (airport)</div>
+                    </div>
+                    <div class="template-card" onclick="loadTemplate('custom')">
+                        <div class="template-title">⚙️ Özel Sorgu</div>
+                        <div class="template-desc">Kendi sorgunuzu yazın</div>
+                        <div class="template-example">SPARQL</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="property-suggestions">
+                <h3>🔧 Popüler Özellikler (Properties)</h3>
+                <div class="property-grid">
+                    <div class="property-item" onclick="showPropertyInfo('P31')">
+                        <span class="property-code">P31</span><br>
+                        <small>instance of</small>
+                    </div>
+                    <div class="property-item" onclick="showPropertyInfo('P17')">
+                        <span class="property-code">P17</span><br>
+                        <small>country</small>
+                    </div>
+                    <div class="property-item" onclick="showPropertyInfo('P131')">
+                        <span class="property-code">P131</span><br>
+                        <small>located in</small>
+                    </div>
+                    <div class="property-item" onclick="showPropertyInfo('P571')">
+                        <span class="property-code">P571</span><br>
+                        <small>inception</small>
+                    </div>
+                    <div class="property-item" onclick="showPropertyInfo('P1435')">
+                        <span class="property-code">P1435</span><br>
+                        <small>heritage designation</small>
+                    </div>
+                    <div class="property-item" onclick="showPropertyInfo('P84')">
+                        <span class="property-code">P84</span><br>
+                        <small>architect</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="query-section">
+                <div class="form-group">
+                    <label for="query">SPARQL Sorgusu:</label>
+                    <textarea id="query" placeholder="Bir şablon seçin veya kendi sorgunuzu yazın..."></textarea>
+                    <small style="margin-top: 5px; color: #666;">💡 İpucu: Üstteki şablonlardan birini seçerek başlayın</small>
+                </div>
+                <div class="form-group">
+                    <button class="btn" onclick="runQuery()" id="runBtn">🔍 Sorgu Çalıştır</button>
+                    <button class="btn" onclick="clearMap()" style="margin-top: 10px; background: #6c757d;">🗑️ Haritayı Temizle</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="messages"></div>
+        
+        <div id="loading" class="loading" style="display: none;">
+            🔄 Wikidata'dan veriler yükleniyor...
+        </div>
+        
+        <div id="map"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script>
+        // Harita başlatma
+        let map = L.map('map').setView([39.0, 35.0], 6);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors | Wikimedia Toolforge'
+        }).addTo(map);
+        
+        let markersGroup = L.layerGroup().addTo(map);
+        
+        // Sorgu şablonları
+        const templates = {
+            castles: `SELECT ?item ?itemLabel ?coord ?inception WHERE {
+  ?item wdt:P31 wd:Q23413 .  # castles
+  ?item wdt:P17 wd:Q43 .     # in Turkey
+  ?item wdt:P625 ?coord .    # with coordinates
+  OPTIONAL { ?item wdt:P571 ?inception }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "tr,en". }
+}
+LIMIT 100`,
+            museums: `SELECT ?item ?itemLabel ?coord ?location WHERE {
+  ?item wdt:P31 wd:Q33506 .  # museums
+  ?item wdt:P17 wd:Q43 .     # in Turkey
+  ?item wdt:P625 ?coord .    # with coordinates
+  OPTIONAL { ?item wdt:P131 ?location }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "tr,en". }
+}
+LIMIT 100`,
+            unesco: `SELECT ?item ?itemLabel ?coord ?country ?countryLabel WHERE {
+  ?item wdt:P1435 wd:Q9259 . # UNESCO World Heritage Site
+  ?item wdt:P625 ?coord .    # with coordinates
+  OPTIONAL { ?item wdt:P17 ?country }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "tr,en". }
+}
+LIMIT 100`,
+            universities: `SELECT ?item ?itemLabel ?coord ?founded WHERE {
+  ?item wdt:P31 wd:Q3918 .   # universities
+  ?item wdt:P17 wd:Q43 .     # in Turkey
+  ?item wdt:P625 ?coord .    # with coordinates
+  OPTIONAL { ?item wdt:P571 ?founded }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "tr,en". }
+}
+LIMIT 100`,
+            airports: `SELECT ?item ?itemLabel ?coord ?iata WHERE {
+  ?item wdt:P31 wd:Q1248784 . # airports
+  ?item wdt:P17 wd:Q43 .      # in Turkey
+  ?item wdt:P625 ?coord .     # with coordinates
+  OPTIONAL { ?item wdt:P238 ?iata }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "tr,en". }
+}
+LIMIT 100`
+        };
+        
+        function loadTemplate(templateName) {
+            const textarea = document.getElementById('query');
+            if (templateName === 'custom') {
+                textarea.value = '';
+                textarea.placeholder = 'SPARQL sorgunuzu buraya yazın...';
+                return;
+            }
+            
+            if (templates[templateName]) {
+                textarea.value = templates[templateName];
+                showMessage(`${templateName} şablonu yüklendi!`, 'success');
+            }
+        }
+        
+        function showPropertyInfo(propertyCode) {
+            const descriptions = {
+                'P31': 'instance of - Bu öğe ne türde bir şey (kale, müze, vb.)',
+                'P17': 'country - Hangi ülkede bulunuyor',
+                'P131': 'located in - Hangi şehir/bölgede bulunuyor',
+                'P571': 'inception - Ne zaman kuruldu/inşa edildi',
+                'P1435': 'heritage designation - Miras durumu (UNESCO vb.)',
+                'P84': 'architect - Kim tasarladı/inşa etti'
+            };
+            
+            showMessage(`${propertyCode}: ${descriptions[propertyCode]}`, 'info');
+        }
+        
+        function showMessage(text, type = 'info') {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type;
+            messageDiv.textContent = text;
+            messagesDiv.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+        
+        function clearMap() {
+            markersGroup.clearLayers();
+            document.getElementById('stats').style.display = 'none';
+            showMessage('Harita temizlendi', 'success');
+        }
+        
+        async function runQuery() {
+            const query = document.getElementById('query').value.trim();
+            const loading = document.getElementById('loading');
+            const runBtn = document.getElementById('runBtn');
+            
+            if (!query) {
+                showMessage('Lütfen bir sorgu girin veya şablon seçin!', 'error');
+                return;
+            }
+            
+            loading.style.display = 'block';
+            runBtn.disabled = true;
+            runBtn.textContent = '⏳ Sorgu çalışıyor...';
+            markersGroup.clearLayers();
+            
+            const startTime = Date.now();
+            
+            try {
+                const url = `https://query.wikidata.org/sparql?query=${encodeURIComponent(query)}&format=json`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                const results = data.results.bindings;
+                const queryTime = ((Date.now() - startTime) / 1000).toFixed(2);
+                
+                let mappedCount = 0;
+                let bounds = [];
+                
+                results.forEach(result => {
+                    if (result.coord && result.coord.value) {
+                        const coordString = result.coord.value;
+                        const match = coordString.match(/Point\(([^ ]+) ([^ ]+)\)/);
+                        
+                        if (match) {
+                            const lng = parseFloat(match[1]);
+                            const lat = parseFloat(match[2]);
+                            
+                            const label = result.itemLabel ? result.itemLabel.value : 'Bilinmeyen';
+                            const itemUrl = result.item.value;
+                            const qid = itemUrl.split('/').pop();
+                            
+                            // Popup içeriği oluşturma
+                            let popupContent = `<div style="max-width: 300px;">`;
+                            popupContent += `<h4 style="margin: 0 0 10px 0; color: #006699;">${label}</h4>`;
+                            popupContent += `<p><strong>Wikidata:</strong> <a href="${itemUrl}" target="_blank">${qid}</a></p>`;
+                            
+                            // Diğer özellikleri ekleme
+                            Object.keys(result).forEach(key => {
+                                if (key !== 'item' && key !== 'itemLabel' && key !== 'coord') {
+                                    const value = result[key].value;
+                                    const displayKey = key.replace(/Label$/, '');
+                                    if (value && !value.includes('http://www.wikidata.org/entity/')) {
+                                        popupContent += `<p><strong>${displayKey}:</strong> ${value}</p>`;
+                                    }
+                                }
+                            });
+                            
+                            popupContent += `</div>`;
+                            
+                            const marker = L.marker([lat, lng])
+                                .bindPopup(popupContent);
+                            
+                            markersGroup.addLayer(marker);
+                            bounds.push([lat, lng]);
+                            mappedCount++;
+                        }
+                    }
+                });
+                
+                if (bounds.length > 0) {
+                    map.fitBounds(bounds);
+                }
+                
+                // İstatistikleri güncelle
+                document.getElementById('totalResults').textContent = results.length;
+                document.getElementById('mappedResults').textContent = mappedCount;
+                document.getElementById('queryTime').textContent = queryTime;
+                document.getElementById('stats').style.display = 'flex';
+                
+                showMessage(`✅ ${mappedCount} konum haritada gösterildi (${results.length} sonuç içinden)`, 'success');
+                
+            } catch (error) {
+                console.error('Sorgu hatası:', error);
+                showMessage(`❌ Sorgu hatası: ${error.message}`, 'error');
+            } finally {
+                loading.style.display = 'none';
+                runBtn.disabled = false;
+                runBtn.textContent = '🔍 Sorgu Çalıştır';
+            }
+        }
+        
+        // Sayfa yüklendiğinde kale şablonunu yükle
+        window.onload = function() {
+            loadTemplate('castles');
+        };
+    </script>
+</body>
+</html>
