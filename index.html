@@ -49,6 +49,69 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
         
+        .filter-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 15px;
+            align-items: end;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        select {
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            transition: border-color 0.3s ease;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #006699;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #006699, #004466);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: fit-content;
+        }
+        
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
         .category-tabs {
             display: flex;
             gap: 20px;
@@ -158,14 +221,21 @@
         .osm-exists { background-color: #2ed573; }
         
         @media (max-width: 768px) {
+            .filter-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
             .category-tabs {
                 flex-direction: column;
                 gap: 0;
             }
+            
             .tab {
                 border-bottom: 1px solid #e1e5e9;
                 border-radius: 0;
             }
+            
             .tab:last-child {
                 border-bottom: none;
             }
@@ -179,6 +249,127 @@
             <p>Türkiye'deki kültürel miras alanlarının OpenStreetMap durumu</p>
             <div class="wikimedia-badge">
                 <small>🏛️ GitHub Pages üzerinde barındırılmaktadır</small>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="filter-section">
+                <h3 style="margin: 0 0 15px 0;">🎯 İl Seçimi</h3>
+                <div class="filter-grid">
+                    <div class="form-group">
+                        <label for="provinceSelect">İl seçin:</label>
+                        <select id="provinceSelect">
+                            <option value="">İl seçiniz...</option>
+                            <option value="Q43518">Adana</option>
+                            <option value="Q181189">Adıyaman</option>
+                            <option value="Q43349">Afyonkarahisar</option>
+                            <option value="Q43603">Ağrı</option>
+                            <option value="Q172885">Aksaray</option>
+                            <option value="Q43346">Amasya</option>
+                            <option value="Q43347">Ankara</option>
+                            <option value="Q43348">Antalya</option>
+                            <option value="Q172931">Ardahan</option>
+                            <option value="Q43611">Artvin</option>
+                            <option value="Q42751">Aydın</option>
+                            <option value="Q43350">Balıkesir</option>
+                            <option value="Q172884">Bartın</option>
+                            <option value="Q43605">Batman</option>
+                            <option value="Q43351">Bayburt</option>
+                            <option value="Q42835">Bilecik</option>
+                            <option value="Q43608">Bingöl</option>
+                            <option value="Q43609">Bitlis</option>
+                            <option value="Q42874">Bolu</option>
+                            <option value="Q43352">Burdur</option>
+                            <option value="Q43353">Bursa</option>
+                            <option value="Q43354">Çanakkale</option>
+                            <option value="Q172926">Çankırı</option>
+                            <option value="Q172890">Çorum</option>
+                            <option value="Q42854">Denizli</option>
+                            <option value="Q172892">Diyarbakır</option>
+                            <option value="Q172939">Düzce</option>
+                            <option value="Q43355">Edirne</option>
+                            <option value="Q43356">Elazığ</option>
+                            <option value="Q42876">Erzincan</option>
+                            <option value="Q43357">Erzurum</option>
+                            <option value="Q43358">Eskişehir</option>
+                            <option value="Q43359">Gaziantep</option>
+                            <option value="Q42865">Giresun</option>
+                            <option value="Q172929">Gümüşhane</option>
+                            <option value="Q610527">Hakkâri</option>
+                            <option value="Q43361">Hatay</option>
+                            <option value="Q172888">Iğdır</option>
+                            <option value="Q42855">Isparta</option>
+                            <option value="Q35">İstanbul</option>
+                            <option value="Q42863">İzmir</option>
+                            <option value="Q172930">Kahramanmaraş</option>
+                            <option value="Q172891">Karabük</option>
+                            <option value="Q172931">Karaman</option>
+                            <option value="Q172885">Kars</option>
+                            <option value="Q172931">Kastamonu</option>
+                            <option value="Q43362">Kayseri</option>
+                            <option value="Q172934">Kırıkkale</option>
+                            <option value="Q172931">Kırklareli</option>
+                            <option value="Q172931">Kırşehir</option>
+                            <option value="Q43363">Kilis</option>
+                            <option value="Q42848">Kocaeli</option>
+                            <option value="Q43364">Konya</option>
+                            <option value="Q42842">Kütahya</option>
+                            <option value="Q172931">Malatya</option>
+                            <option value="Q42829">Manisa</option>
+                            <option value="Q172931">Mardin</option>
+                            <option value="Q172931">Mersin</option>
+                            <option value="Q172931">Muğla</option>
+                            <option value="Q172931">Muş</option>
+                            <option value="Q172931">Nevşehir</option>
+                            <option value="Q172931">Niğde</option>
+                            <option value="Q42868">Ordu</option>
+                            <option value="Q172931">Osmaniye</option>
+                            <option value="Q172931">Rize</option>
+                            <option value="Q43365">Sakarya</option>
+                            <option value="Q43366">Samsun</option>
+                            <option value="Q43367">Şanlıurfa</option>
+                            <option value="Q43368">Siirt</option>
+                            <option value="Q43369">Sinop</option>
+                            <option value="Q43370">Sivas</option>
+                            <option value="Q172931">Şırnak</option>
+                            <option value="Q43371">Tekirdağ</option>
+                            <option value="Q43372">Tokat</option>
+                            <option value="Q43373">Trabzon</option>
+                            <option value="Q43374">Tunceli</option>
+                            <option value="Q43375">Uşak</option>
+                            <option value="Q43376">Van</option>
+                            <option value="Q172931">Yalova</option>
+                            <option value="Q43377">Yozgat</option>
+                            <option value="Q43378">Zonguldak</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="categorySelect">Kategori:</label>
+                        <select id="categorySelect">
+                            <option value="openstreetmap">OpenStreetMap Verisi Olmayan</option>
+                            <option value="commons">Commons Görseli Olmayan</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button class="btn" onclick="loadData()" id="loadBtn">
+                            📍 Verileri Getir
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="legend">
+                <h4 style="margin: 0 0 10px 0;">🎨 Harita Gösterimi</h4>
+                <div class="legend-item">
+                    <div class="legend-color osm-missing"></div>
+                    <span>OpenStreetMap verisi bulunmayan alanlar</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color osm-exists"></div>
+                    <span>OpenStreetMap verisi bulunan alanlar</span>
+                </div>
             </div>
         </div>
         
@@ -201,29 +392,6 @@
             </div>
         </div>
         
-        <div class="controls">
-            <div class="category-tabs">
-                <button class="tab active" onclick="switchCategory('openstreetmap')" id="osmTab">
-                    🗺️ OpenStreetMap Verisi Olmayan
-                </button>
-                <button class="tab" onclick="switchCategory('commons')" id="commonsTab">
-                    📸 Commons Görseli Olmayan
-                </button>
-            </div>
-            
-            <div class="legend">
-                <h4 style="margin: 0 0 10px 0;">🎨 Harita Gösterimi</h4>
-                <div class="legend-item">
-                    <div class="legend-color osm-missing"></div>
-                    <span>OpenStreetMap verisi bulunmayan alanlar</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color osm-exists"></div>
-                    <span>OpenStreetMap verisi bulunan alanlar</span>
-                </div>
-            </div>
-        </div>
-        
         <div id="messages"></div>
         
         <div id="loading" class="loading" style="display: none;">
@@ -243,12 +411,44 @@
         }).addTo(map);
         
         let markersGroup = L.layerGroup().addTo(map);
-        let currentCategory = 'openstreetmap';
         
-        // OSM verisi olmayan alanlar sorgusu
-        const osmQuery = `SELECT DISTINCT ?place ?placeLabel ?coordinates (SAMPLE(?layerLabel) AS ?layer)
+        function showMessage(text, type = 'info') {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type;
+            messageDiv.textContent = text;
+            messagesDiv.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+        
+        function loadData() {
+            const provinceSelect = document.getElementById('provinceSelect');
+            const categorySelect = document.getElementById('categorySelect');
+            const selectedProvince = provinceSelect.value;
+            
+            if (!selectedProvince) {
+                showMessage('Lütfen bir il seçin!', 'error');
+                return;
+            }
+            
+            const provinceName = provinceSelect.options[provinceSelect.selectedIndex].text;
+            const category = categorySelect.value;
+            
+            if (category === 'openstreetmap') {
+                runOSMQuery(selectedProvince, provinceName);
+            } else {
+                runCommonsQuery(selectedProvince, provinceName);
+            }
+        }
+        
+        async function runOSMQuery(provinceQID, provinceName) {
+            const query = `SELECT DISTINCT ?place ?placeLabel ?coordinates (SAMPLE(?layerLabel) AS ?layer)
 WHERE {
   ?place wdt:P17 wd:Q43;              # Ülkesi Türkiye
+         wdt:P131*/wdt:P131* wd:${provinceQID}; # ${provinceName} ili içinde
          wdt:P11729 ?keID.             # KE ID mevcut
   OPTIONAL { ?place wdt:P5816 ?status. }    # Koruma durumu varsa al
   OPTIONAL { ?place wdt:P11693 ?rel. }      # OSM node ID
@@ -270,10 +470,14 @@ WHERE {
 }
 GROUP BY ?place ?placeLabel ?coordinates`;
 
-        // Commons görseli olmayan alanlar sorgusu (gelecekte eklenecek)
-        const commonsQuery = `SELECT DISTINCT ?place ?placeLabel ?coordinates ?image
+            await runQuery(query, provinceName, 'openstreetmap');
+        }
+        
+        async function runCommonsQuery(provinceQID, provinceName) {
+            const query = `SELECT DISTINCT ?place ?placeLabel ?coordinates ?image
 WHERE {
   ?place wdt:P17 wd:Q43;              # Ülkesi Türkiye
+         wdt:P131*/wdt:P131* wd:${provinceQID}; # ${provinceName} ili içinde
          wdt:P11729 ?keID.             # KE ID mevcut
   OPTIONAL { ?place wdt:P625 ?coordinates. }  # Koordinat varsa
   OPTIONAL { ?place wdt:P18 ?image. }         # Görsel varsa
@@ -281,40 +485,17 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],tr". }
 }
 LIMIT 100`;
-        
-        function switchCategory(category) {
-            currentCategory = category;
-            
-            // Tab durumunu güncelle
-            document.getElementById('osmTab').classList.toggle('active', category === 'openstreetmap');
-            document.getElementById('commonsTab').classList.toggle('active', category === 'commons');
-            
-            // Haritayı temizle ve yeni veriyi yükle
-            markersGroup.clearLayers();
-            
-            if (category === 'openstreetmap') {
-                runQuery(osmQuery);
-            } else {
-                runQuery(commonsQuery);
-            }
+
+            await runQuery(query, provinceName, 'commons');
         }
         
-        function showMessage(text, type = 'info') {
-            const messagesDiv = document.getElementById('messages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = type;
-            messageDiv.textContent = text;
-            messagesDiv.appendChild(messageDiv);
-            
-            setTimeout(() => {
-                messageDiv.remove();
-            }, 5000);
-        }
-        
-        async function runQuery(query) {
+        async function runQuery(query, provinceName, category) {
             const loading = document.getElementById('loading');
+            const loadBtn = document.getElementById('loadBtn');
             
             loading.style.display = 'block';
+            loadBtn.disabled = true;
+            loadBtn.textContent = '⏳ Yükleniyor...';
             markersGroup.clearLayers();
             
             const startTime = Date.now();
@@ -350,12 +531,20 @@ LIMIT 100`;
                             const qid = itemUrl.split('/').pop();
                             
                             // OSM durumunu belirle
-                            const hasOsmData = result.layer && result.layer.value === "OSM verisi var";
-                            const markerColor = hasOsmData ? '#2ed573' : '#ff4757';
+                            let hasOsmData = false;
+                            let markerColor = '#ff4757';
                             
-                            if (hasOsmData) {
-                                osmExistsCount++;
+                            if (category === 'openstreetmap') {
+                                hasOsmData = result.layer && result.layer.value === "OSM verisi var";
+                                markerColor = hasOsmData ? '#2ed573' : '#ff4757';
+                                
+                                if (hasOsmData) {
+                                    osmExistsCount++;
+                                } else {
+                                    osmMissingCount++;
+                                }
                             } else {
+                                // Commons kategorisi için kırmızı (görsel yok)
                                 osmMissingCount++;
                             }
                             
@@ -371,15 +560,18 @@ LIMIT 100`;
                             let popupContent = `<div style="max-width: 300px;">`;
                             popupContent += `<h4 style="margin: 0 0 10px 0; color: #006699;">${label}</h4>`;
                             
-                            if (currentCategory === 'openstreetmap') {
+                            if (category === 'openstreetmap') {
                                 const osmStatus = hasOsmData ? 
                                     '<span style="color: #2ed573;">✅ OSM verisi mevcut</span>' : 
                                     '<span style="color: #ff4757;">❌ OSM verisi eksik</span>';
                                 popupContent += `<p><strong>Durum:</strong> ${osmStatus}</p>`;
+                            } else {
+                                popupContent += `<p><strong>Durum:</strong> <span style="color: #ff4757;">📷 Commons görseli eksik</span></p>`;
                             }
                             
+                            popupContent += `<p><strong>Konum:</strong> ${provinceName}</p>`;
                             popupContent += `<p><strong>Wikidata:</strong> <a href="${itemUrl}" target="_blank" style="color: #006699;">${qid}</a></p>`;
-                            popupContent += `<p><a href="${itemUrl}" target="_blank" style="color: #006699; text-decoration: none;">🔗 Sayfayı Aç</a></p>`;
+                            popupContent += `<p><a href="${itemUrl}" target="_blank" style="color: #006699; text-decoration: none; background: #f0f8ff; padding: 5px 10px; border-radius: 5px; display: inline-block;">🔗 Wikidata Sayfasını Aç</a></p>`;
                             popupContent += `</div>`;
                             
                             const marker = L.marker([lat, lng], { icon: customIcon })
@@ -400,6 +592,8 @@ LIMIT 100`;
                 
                 if (bounds.length > 0) {
                     map.fitBounds(bounds);
+                } else {
+                    showMessage(`${provinceName} ilinde bu kriterlere uygun veri bulunamadı.`, 'error');
                 }
                 
                 // İstatistikleri güncelle
@@ -409,20 +603,17 @@ LIMIT 100`;
                 document.getElementById('queryTime').textContent = queryTime;
                 document.getElementById('stats').style.display = 'flex';
                 
-                showMessage(`✅ ${mappedCount} konum haritada gösterildi`, 'success');
+                showMessage(`✅ ${provinceName} ili: ${mappedCount} konum haritada gösterildi`, 'success');
                 
             } catch (error) {
                 console.error('Sorgu hatası:', error);
                 showMessage(`❌ Sorgu hatası: ${error.message}`, 'error');
             } finally {
                 loading.style.display = 'none';
+                loadBtn.disabled = false;
+                loadBtn.textContent = '📍 Verileri Getir';
             }
         }
-        
-        // Sayfa yüklendiğinde OSM verisi olmayan alanları yükle
-        window.onload = function() {
-            runQuery(osmQuery);
-        };
     </script>
 </body>
 </html>
