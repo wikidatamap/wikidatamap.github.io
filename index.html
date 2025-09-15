@@ -759,7 +759,9 @@ LIMIT 100`;
                                 if (hasOsmData && osmUrl && osmId) {
                                     popupContent += `<p><strong>Durum:</strong> <span style="color: #2ed573;">✅ OSM verisi mevcut</span> - <a href="${osmUrl}" target="_blank" style="color: #006699; text-decoration: none; background: #e8f4fd; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.9em;">${osmId}</a></p>`;
                                 } else {
-                                    popupContent += `<p><strong>Durum:</strong> <span style="color: #ff4757;">❌ OSM verisi eksik</span></p>`;
+                                    // OSM'de arama URL'i oluştur
+                                    const osmSearchUrl = `https://www.openstreetmap.org/query?lat=${lat}&lon=${lng}#map=19/${lat}/${lng}`;
+                                    popupContent += `<p><strong>Durum:</strong> <span style="color: #ff4757;">❌ OSM verisi eksik</span> - <a href="${osmSearchUrl}" target="_blank" style="color: #ff4757; text-decoration: none; background: #ffe8e8; padding: 2px 6px; border-radius: 4px; font-size: 0.9em;">🔍 OSM'de ara</a></p>`;
                                 }
                             } else {
                                 popupContent += `<p><strong>Durum:</strong> <span style="color: #ff4757;">📷 Commons görseli eksik</span></p>`;
