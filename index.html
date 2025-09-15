@@ -522,15 +522,15 @@
         }
         
         async function runOSMQuery(provinceQID, provinceName) {
-            const query = `SELECT DISTINCT ?place ?placeLabel ?coordinates (SAMPLE(?layerLabel) AS ?layer)
+            const query = `SELECT DISTINCT ?place ?placeLabel ?coordinates (SAMPLE(?layerLabel) AS ?layer) (SAMPLE(?osmWay) AS ?osmWay) (SAMPLE(?osmRel) AS ?osmRel) (SAMPLE(?osmNode) AS ?osmNode)
 WHERE {
   ?place wdt:P17 wd:Q43;              # Ülkesi Türkiye
          wdt:P131*/wdt:P131* wd:${provinceQID}; # ${provinceName} ili içinde
          wdt:P11729 ?keID.             # KE ID mevcut
   OPTIONAL { ?place wdt:P5816 ?status. }    # Koruma durumu varsa al
-  OPTIONAL { ?place wdt:P11693 ?rel. }      # OSM node ID
-  OPTIONAL { ?place wdt:P10689 ?way. }      # OSM way ID
-  OPTIONAL { ?place wdt:P402 ?nominatim. }  # OSM relation ID
+  OPTIONAL { ?place wdt:P11693 ?osmNode. }      # OSM node ID
+  OPTIONAL { ?place wdt:P10689 ?osmWay. }      # OSM way ID
+  OPTIONAL { ?place wdt:P402 ?osmRel. }  # OSM relation ID
   OPTIONAL { ?place wdt:P625 ?coordinates. }  # Koordinat varsa
   # İstediğimiz filtre:
   FILTER(
@@ -538,7 +538,7 @@ WHERE {
     (?status IN (wd:Q56557591, wd:Q75505084, wd:Q27132179))
   )
   BIND(
-    IF(BOUND(?rel) || BOUND(?way) || BOUND(?nominatim),
+    IF(BOUND(?osmNode) || BOUND(?osmWay) || BOUND(?osmRel),
       "OSM verisi var",
       "OSM verisi yok"
     ) AS ?layerLabel
@@ -607,13 +607,32 @@ LIMIT 100`;
                             const itemUrl = result.place.value;
                             const qid = itemUrl.split('/').pop();
                             
+                            // OSM verilerini kontrol et
+                            const osmWay = result.osmWay ? result.osmWay.value : null;
+                            const osmRel = result.osmRel ? result.osmRel.value : null;
+                            const osmNode = result.osmNode ? result.osmNode.value : null;
+                            
                             // OSM durumunu belirle
                             let hasOsmData = false;
                             let markerColor = '#ff4757';
+                            let osmUrl = null;
+                            let osmId = null;
                             
                             if (category === 'openstreetmap') {
                                 hasOsmData = result.layer && result.layer.value === "OSM verisi var";
                                 markerColor = hasOsmData ? '#2ed573' : '#ff4757';
+                                
+                                // OSM URL'ini belirle (öncelik sırası: way > relation > node)
+                                if (osmWay) {
+                                    osmUrl = `https://www.openstreetmap.org/way/${osmWay}`;
+                                    osmId = `way/${osmWay}`;
+                                } else if (osmRel) {
+                                    osmUrl = `https://www.openstreetmap.org/relation/${osmRel}`;
+                                    osmId = `relation/${osmRel}`;
+                                } else if (osmNode) {
+                                    osmUrl = `https://www.openstreetmap.org/node/${osmNode}`;
+                                    osmId = `node/${osmNode}`;
+                                }
                                 
                                 if (hasOsmData) {
                                     osmExistsCount++;
@@ -638,10 +657,11 @@ LIMIT 100`;
                             popupContent += `<h4 style="margin: 0 0 10px 0; color: #006699;">${label}</h4>`;
                             
                             if (category === 'openstreetmap') {
-                                const osmStatus = hasOsmData ? 
-                                    '<span style="color: #2ed573;">✅ OSM verisi mevcut</span>' : 
-                                    '<span style="color: #ff4757;">❌ OSM verisi eksik</span>';
-                                popupContent += `<p><strong>Durum:</strong> ${osmStatus}</p>`;
+                                if (hasOsmData && osmUrl && osmId) {
+                                    popupContent += `<p><strong>Durum:</strong> <span style="color: #2ed573;">✅ OSM verisi mevcut</span> - <a href="${osmUrl}" target="_blank" style="color: #006699; text-decoration: none; background: #e8f4fd; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.9em;">${osmId}</a></p>`;
+                                } else {
+                                    popupContent += `<p><strong>Durum:</strong> <span style="color: #ff4757;">❌ OSM verisi eksik</span></p>`;
+                                }
                             } else {
                                 popupContent += `<p><strong>Durum:</strong> <span style="color: #ff4757;">📷 Commons görseli eksik</span></p>`;
                             }
