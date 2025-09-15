@@ -503,8 +503,11 @@
         }
         
         function loadData() {
+            console.log('loadData fonksiyonu çağrıldı');
             const provinceSelect = document.getElementById('provinceSelect');
             const selectedProvince = provinceSelect.value;
+            
+            console.log('Seçilen il:', selectedProvince);
             
             if (!selectedProvince) {
                 showMessage('Lütfen bir il seçin!', 'error');
@@ -512,6 +515,7 @@
             }
             
             const provinceName = provinceSelect.options[provinceSelect.selectedIndex].text;
+            console.log('İl adı:', provinceName);
             
             // Sadece OpenStreetMap verisi olmayan alanları göster
             runOSMQuery(selectedProvince, provinceName);
