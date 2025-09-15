@@ -40,6 +40,60 @@
             display: inline-block;
             backdrop-filter: blur(10px);
         }
+
+        .guide-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .guide-section h3 {
+            color: #006699;
+            margin-top: 0;
+            font-size: 1.3em;
+            border-bottom: 2px solid #f0f8ff;
+            padding-bottom: 10px;
+        }
+
+        .guide-section p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .step {
+            background: #f8f9fa;
+            border-left: 4px solid #006699;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .step h4 {
+            color: #006699;
+            margin: 0 0 10px 0;
+            font-size: 1.1em;
+        }
+
+        .step ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .step li {
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+
+        .property-code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #d73502;
+        }
         
         .controls {
             background: white;
@@ -249,6 +303,37 @@
             <p>Türkiye'deki kültürel miras alanlarının OpenStreetMap durumu</p>
             <div class="wikimedia-badge">
                 <small>🏛️ GitHub Pages üzerinde barındırılmaktadır</small>
+            </div>
+        </div>
+
+        <div class="guide-section">
+            <h3>📚 OpenStreetMap ve Wikidata Arasında Bağlantı Kurma Rehberi</h3>
+            <p>OpenStreetMap'teki coğrafi veriler ile Wikidata'daki bilgileri birbirine bağlamak için iki yönlü bir süreç izlenir:</p>
+            
+            <div class="step">
+                <h4>1. Aşama: OpenStreetMap'e Wikidata Bilgisi Ekleme</h4>
+                <p>OpenStreetMap üzerinde bulunan mevcut Way (yol/alan) veya Relation (ilişki) öğesine <span class="property-code">wikidata=</span> etiketi eklenir. Bu etiketin değeri olarak Wikidata'daki ilgili öğenin Qid numarası (örneğin Q12345) yazılır.</p>
+            </div>
+
+            <div class="step">
+                <h4>2. Aşama: Wikidata'ya OpenStreetMap Bilgisi Ekleme</h4>
+                <p>Wikidata'daki ilgili Qid öğesine OpenStreetMap'teki way veya relation numarası eklenir. Bu işlem için aşağıdaki özellikler (Property) kullanılır:</p>
+                <ul>
+                    <li><strong><span class="property-code">P10689</span> - OpenStreetMap yol tanımlayıcı:</strong>
+                        <ul>
+                            <li>Tekil yapılar için kullanılır</li>
+                            <li>Binalar, camiler, müzeler, anıtlar gibi mimari yapılarda tercih edilir</li>
+                            <li>Kültürel varlıkların büyük çoğunluğu bu kategori altında yer alır</li>
+                        </ul>
+                    </li>
+                    <li><strong><span class="property-code">P402</span> - OpenStreetMap ilişki tanımlayıcı:</strong>
+                        <ul>
+                            <li>Çoklu yapı kompleksleri için kullanılır</li>
+                            <li>Külliyeler, üniversite kampüsleri, hastane kompleksleri gibi birden fazla yapıyı içeren yapı gruplarında tercih edilir</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p>Bu iki aşamalı süreç tamamlandığında, OpenStreetMap ve Wikidata arasında karşılıklı referans oluşturulmuş olur.</p>
             </div>
         </div>
         
@@ -611,9 +696,4 @@ LIMIT 100`;
             } finally {
                 loading.style.display = 'none';
                 loadBtn.disabled = false;
-                loadBtn.textContent = '📍 Verileri Getir';
-            }
-        }
-    </script>
-</body>
-</html>
+                loadBtn.
