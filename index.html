@@ -621,7 +621,7 @@
                 locationFilter = `wdt:P131*/wdt:P131* wd:${provinceQID};`;
             }
             
-            const query = `SELECT DISTINCT ?place ?placeLabel ?coordinates (SAMPLE(?layerLabel) AS ?layer) (SAMPLE(?osmWay) AS ?osmWay) (SAMPLE(?osmRel) AS ?osmRel) (SAMPLE(?osmNode) AS ?osmNode)
+            const query = `SELECT DISTINCT ?place ?placeLabel ?coordinates (SAMPLE(?layerLabel) AS ?layer) (SAMPLE(?osmWay) AS ?osmWay) (SAMPLE(?osmRel) AS ?osmRel) (SAMPLE(?osmNode) AS ?osmNode) (SAMPLE(?keID) AS ?keID)
 WHERE {
   ?place wdt:P17 wd:Q43;              # Ülkesi Türkiye
          ${locationFilter}            # Seçilen alan içinde
@@ -705,6 +705,7 @@ LIMIT 100`;
                             const label = result.placeLabel ? result.placeLabel.value : 'Bilinmeyen';
                             const itemUrl = result.place.value;
                             const qid = itemUrl.split('/').pop();
+                            const keID = result.keID ? result.keID.value : null;
                             
                             // OSM verilerini kontrol et
                             const osmWay = result.osmWay ? result.osmWay.value : null;
@@ -769,7 +770,22 @@ LIMIT 100`;
                             
                             popupContent += `<p><strong>Konum:</strong> ${locationName}</p>`;
                             popupContent += `<p><strong>Wikidata:</strong> <a href="${itemUrl}" target="_blank" style="color: #006699;">${qid}</a></p>`;
-                            popupContent += `<p><a href="${itemUrl}" target="_blank" style="color: #006699; text-decoration: none; background: #f0f8ff; padding: 5px 10px; border-radius: 5px; display: inline-block;">🔗 Wikidata Sayfasını Aç</a></p>`;
+                            
+                            // Diğer bağlantılar bölümü
+                            popupContent += `<div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee;">`;
+                            popupContent += `<h5 style="margin: 0 0 8px 0; color: #666; font-size: 0.9em;">🔗 Diğer Bağlantılar</h5>`;
+                            
+                            // Google Maps bağlantısı
+                            const googleMapsUrl = `https://www.google.com/maps/place/${lat},${lng}`;
+                            popupContent += `<p style="margin: 5px 0;"><a href="${googleMapsUrl}" target="_blank" style="color: #006699; text-decoration: none; background: #f0f8ff; padding: 3px 8px; border-radius: 4px; display: inline-block; font-size: 0.9em;">🌍 Google Maps'te ara</a></p>`;
+                            
+                            // Kültür Envanteri bağlantısı
+                            if (keID) {
+                                const keUrl = `https://kulturenvanteri.com/yer/?p=${keID}`;
+                                popupContent += `<p style="margin: 5px 0;"><a href="${keUrl}" target="_blank" style="color: #006699; text-decoration: none; background: #f0f8ff; padding: 3px 8px; border-radius: 4px; display: inline-block; font-size: 0.9em;">🏛️ KE'de ara</a></p>`;
+                            }
+                            
+                            popupContent += `</div>`;
                             popupContent += `</div>`;
                             
                             const marker = L.marker([lat, lng], { icon: customIcon })
