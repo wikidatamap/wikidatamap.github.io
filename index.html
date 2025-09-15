@@ -668,6 +668,7 @@ LIMIT 100`;
         async function runQuery(query, locationName, category) {
             const loading = document.getElementById('loading');
             const loadBtn = document.getElementById('loadBtn');
+            const selectedProvince = document.getElementById('provinceSelect').value; // Bu satırı ekledik
             
             loading.style.display = 'block';
             loadBtn.disabled = true;
@@ -800,7 +801,10 @@ LIMIT 100`;
                             popupContent += `<p style="margin: 5px 0;"><a href="${yandexMapsUrl}" target="_blank" style="color: #006699; text-decoration: none; background: #f0f8ff; padding: 3px 8px; border-radius: 4px; display: inline-block; font-size: 0.9em;">🗺️ Yandex Maps'te ara</a></p>`;
                             
                             // İBB Kültür Envanteri bağlantısı (sadece İstanbul için)
-                            if (selectedProvince === 'Q534799' || (districtQID && istanbulDistricts.some(d => d.qid === districtQID))) {
+                            const districtSelect = document.getElementById('districtSelect');
+                            const selectedDistrict = districtSelect.value;
+                            
+                            if (selectedProvince === 'Q534799' || (selectedDistrict && istanbulDistricts.some(d => d.qid === selectedDistrict))) {
                                 const ibbUrl = `https://kulturenvanteri.ibb.gov.tr/portal/apps/webappviewer/index.html?id=62758a0e55e6462e9dbff7d5737e5ed2&marker=${lng},${lat},&level=18`;
                                 popupContent += `<p style="margin: 5px 0;"><a href="${ibbUrl}" target="_blank" style="color: #006699; text-decoration: none; background: #f0f8ff; padding: 3px 8px; border-radius: 4px; display: inline-block; font-size: 0.9em;">🏢 İBB'de ara</a></p>`;
                             }
