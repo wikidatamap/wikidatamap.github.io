@@ -112,7 +112,7 @@
         
         .filter-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr auto;
+            grid-template-columns: 1fr auto;
             gap: 15px;
             align-items: end;
         }
@@ -312,7 +312,7 @@
             
             <div class="step">
                 <h4>1. Aşama: OpenStreetMap'e Wikidata Bilgisi Ekleme</h4>
-                <p>OpenStreetMap üzerinde bulunan mevcut Way (yol) veya Relation (ilişki) öğesine <span class="property-code">wikidata=</span> etiketi eklenir. Bu etiketin değeri olarak Wikidata'daki ilgili öğenin Qid numarası (örneğin Q12345) yazılır.</p>
+                <p>OpenStreetMap üzerinde bulunan mevcut Way (yol/alan) veya Relation (ilişki) öğesine <span class="property-code">wikidata=</span> etiketi eklenir. Bu etiketin değeri olarak Wikidata'daki ilgili öğenin Qid numarası (örneğin Q12345) yazılır.</p>
             </div>
 
             <div class="step">
@@ -335,7 +335,7 @@
                 </ul>
             </div>
             
-            <p><strong>Bu iki aşamalı süreç tamamlandığında, OpenStreetMap ve Wikidata arasında karşılıklı eşleştirme oluşturulmuş olur.</strong></p>
+            <p><strong>Bu iki aşamalı süreç tamamlandığında, OpenStreetMap ve Wikidata arasında karşılıklı referans oluşturulmuş olur.</strong></p>
         </div>
         
         <div class="controls">
@@ -431,14 +431,6 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="categorySelect">Kategori:</label>
-                        <select id="categorySelect">
-                            <option value="openstreetmap">OpenStreetMap Verisi Olmayan</option>
-                            <option value="commons">Commons Görseli Olmayan</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
                         <button class="btn" onclick="loadData()" id="loadBtn">
                             📍 Verileri Getir
                         </button>
@@ -512,7 +504,6 @@
         
         function loadData() {
             const provinceSelect = document.getElementById('provinceSelect');
-            const categorySelect = document.getElementById('categorySelect');
             const selectedProvince = provinceSelect.value;
             
             if (!selectedProvince) {
@@ -521,13 +512,9 @@
             }
             
             const provinceName = provinceSelect.options[provinceSelect.selectedIndex].text;
-            const category = categorySelect.value;
             
-            if (category === 'openstreetmap') {
-                runOSMQuery(selectedProvince, provinceName);
-            } else {
-                runCommonsQuery(selectedProvince, provinceName);
-            }
+            // Sadece OpenStreetMap verisi olmayan alanları göster
+            runOSMQuery(selectedProvince, provinceName);
         }
         
         async function runOSMQuery(provinceQID, provinceName) {
