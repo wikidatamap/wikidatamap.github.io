@@ -112,7 +112,7 @@
         
         .filter-grid {
             display: grid;
-            grid-template-columns: 1fr auto;
+            grid-template-columns: 1fr 1fr auto;
             gap: 15px;
             align-items: end;
         }
@@ -344,7 +344,7 @@
                 <div class="filter-grid">
                     <div class="form-group">
                         <label for="provinceSelect">İl seçin:</label>
-                        <select id="provinceSelect">
+                        <select id="provinceSelect" onchange="handleProvinceChange()">
                             <option value="">İl seçiniz...</option>
                             <option value="Q40549">Adana</option>
                             <option value="Q43924">Adıyaman</option>
@@ -429,6 +429,13 @@
                             <option value="Q219956">Zonguldak</option>
                         </select>
                     </div>
+
+                    <div class="form-group" id="districtGroup" style="display: none;">
+                        <label for="districtSelect">İlçe seçin (İsteğe bağlı):</label>
+                        <select id="districtSelect">
+                            <option value="">Tüm ilçeler</option>
+                        </select>
+                    </div>
                     
                     <div class="form-group">
                         <button class="btn" onclick="loadData()" id="loadBtn">
@@ -481,6 +488,73 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <script>
+        // İstanbul ilçeleri
+        const istanbulDistricts = [
+            {qid: "Q1020668", name: "Adalar"},
+            {qid: "Q691764", name: "Arnavutköy"},
+            {qid: "Q753882", name: "Ataşehir"},
+            {qid: "Q340148", name: "Avcılar"},
+            {qid: "Q746516", name: "Bağcılar"},
+            {qid: "Q788634", name: "Bahçelievler"},
+            {qid: "Q752528", name: "Bakırköy"},
+            {qid: "Q791607", name: "Başakşehir"},
+            {qid: "Q791567", name: "Bayrampaşa"},
+            {qid: "Q459495", name: "Beşiktaş"},
+            {qid: "Q794351", name: "Beykoz"},
+            {qid: "Q794356", name: "Beylikdüzü"},
+            {qid: "Q217411", name: "Beyoğlu"},
+            {qid: "Q840258", name: "Büyükçekmece"},
+            {qid: "Q272681", name: "Çatalca"},
+            {qid: "Q122320", name: "Çekmeköy"},
+            {qid: "Q378714", name: "Esenler"},
+            {qid: "Q268983", name: "Esenyurt"},
+            {qid: "Q673073", name: "Eyüpsultan"},
+            {qid: "Q732923", name: "Fatih"},
+            {qid: "Q570826", name: "Gaziosmanpaşa"},
+            {qid: "Q932166", name: "Güngören"},
+            {qid: "Q932886", name: "Kadıköy"},
+            {qid: "Q284489", name: "Kağıthane"},
+            {qid: "Q639014", name: "Kartal"},
+            {qid: "Q639240", name: "Küçükçekmece"},
+            {qid: "Q739547", name: "Maltepe"},
+            {qid: "Q857056", name: "Pendik"},
+            {qid: "Q253182", name: "Sancaktepe"},
+            {qid: "Q857107", name: "Sarıyer"},
+            {qid: "Q732028", name: "Silivri"},
+            {qid: "Q673890", name: "Sultanbeyli"},
+            {qid: "Q268747", name: "Sultangazi"},
+            {qid: "Q241631", name: "Şile"},
+            {qid: "Q390637", name: "Şişli"},
+            {qid: "Q938548", name: "Tuzla"},
+            {qid: "Q334924", name: "Ümraniye"},
+            {qid: "Q326339", name: "Üsküdar"},
+            {qid: "Q197095", name: "Zeytinburnu"}
+        ];
+
+        function handleProvinceChange() {
+            const provinceSelect = document.getElementById('provinceSelect');
+            const districtGroup = document.getElementById('districtGroup');
+            const districtSelect = document.getElementById('districtSelect');
+            
+            if (provinceSelect.value === 'Q534799') { // İstanbul seçildi
+                // İlçe seçimini göster
+                districtGroup.style.display = 'block';
+                
+                // İlçe listesini temizle ve yeniden doldur
+                districtSelect.innerHTML = '<option value="">Tüm ilçeler</option>';
+                istanbulDistricts.forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district.qid;
+                    option.textContent = district.name;
+                    districtSelect.appendChild(option);
+                });
+            } else {
+                // İlçe seçimini gizle
+                districtGroup.style.display = 'none';
+                districtSelect.innerHTML = '<option value="">Tüm ilçeler</option>';
+            }
+        }
+        
         // Harita başlatma
         let map = L.map('map').setView([39.0, 35.0], 6);
         
@@ -505,9 +579,12 @@
         function loadData() {
             console.log('loadData fonksiyonu çağrıldı');
             const provinceSelect = document.getElementById('provinceSelect');
+            const districtSelect = document.getElementById('districtSelect');
             const selectedProvince = provinceSelect.value;
+            const selectedDistrict = districtSelect.value;
             
             console.log('Seçilen il:', selectedProvince);
+            console.log('Seçilen ilçe:', selectedDistrict);
             
             if (!selectedProvince) {
                 showMessage('Lütfen bir il seçin!', 'error');
@@ -518,14 +595,27 @@
             console.log('İl adı:', provinceName);
             
             // Sadece OpenStreetMap verisi olmayan alanları göster
-            runOSMQuery(selectedProvince, provinceName);
+            runOSMQuery(selectedProvince, provinceName, selectedDistrict);
         }
         
-        async function runOSMQuery(provinceQID, provinceName) {
+        async function runOSMQuery(provinceQID, provinceName, districtQID = null) {
+            let locationFilter = '';
+            let locationName = provinceName;
+            
+            if (districtQID) {
+                // İlçe seçildiyse, sadece o ilçede ara
+                locationFilter = `wdt:P131*/wdt:P131* wd:${districtQID};`;
+                const districtName = istanbulDistricts.find(d => d.qid === districtQID)?.name;
+                locationName = `${districtName}, ${provinceName}`;
+            } else {
+                // İl genelinde ara
+                locationFilter = `wdt:P131*/wdt:P131* wd:${provinceQID};`;
+            }
+            
             const query = `SELECT DISTINCT ?place ?placeLabel ?coordinates (SAMPLE(?layerLabel) AS ?layer) (SAMPLE(?osmWay) AS ?osmWay) (SAMPLE(?osmRel) AS ?osmRel) (SAMPLE(?osmNode) AS ?osmNode)
 WHERE {
   ?place wdt:P17 wd:Q43;              # Ülkesi Türkiye
-         wdt:P131*/wdt:P131* wd:${provinceQID}; # ${provinceName} ili içinde
+         ${locationFilter}            # Seçilen alan içinde
          wdt:P11729 ?keID.             # KE ID mevcut
   OPTIONAL { ?place wdt:P5816 ?status. }    # Koruma durumu varsa al
   OPTIONAL { ?place wdt:P11693 ?osmNode. }      # OSM node ID
@@ -547,7 +637,7 @@ WHERE {
 }
 GROUP BY ?place ?placeLabel ?coordinates`;
 
-            await runQuery(query, provinceName, 'openstreetmap');
+            await runQuery(query, locationName, 'openstreetmap');
         }
         
         async function runCommonsQuery(provinceQID, provinceName) {
@@ -566,7 +656,7 @@ LIMIT 100`;
             await runQuery(query, provinceName, 'commons');
         }
         
-        async function runQuery(query, provinceName, category) {
+        async function runQuery(query, locationName, category) {
             const loading = document.getElementById('loading');
             const loadBtn = document.getElementById('loadBtn');
             
@@ -666,7 +756,7 @@ LIMIT 100`;
                                 popupContent += `<p><strong>Durum:</strong> <span style="color: #ff4757;">📷 Commons görseli eksik</span></p>`;
                             }
                             
-                            popupContent += `<p><strong>Konum:</strong> ${provinceName}</p>`;
+                            popupContent += `<p><strong>Konum:</strong> ${locationName}</p>`;
                             popupContent += `<p><strong>Wikidata:</strong> <a href="${itemUrl}" target="_blank" style="color: #006699;">${qid}</a></p>`;
                             popupContent += `<p><a href="${itemUrl}" target="_blank" style="color: #006699; text-decoration: none; background: #f0f8ff; padding: 5px 10px; border-radius: 5px; display: inline-block;">🔗 Wikidata Sayfasını Aç</a></p>`;
                             popupContent += `</div>`;
@@ -690,7 +780,7 @@ LIMIT 100`;
                 if (bounds.length > 0) {
                     map.fitBounds(bounds);
                 } else {
-                    showMessage(`${provinceName} ilinde bu kriterlere uygun veri bulunamadı.`, 'error');
+                    showMessage(`${locationName} bölgesinde bu kriterlere uygun veri bulunamadı.`, 'error');
                 }
                 
                 // İstatistikleri güncelle
@@ -700,7 +790,7 @@ LIMIT 100`;
                 document.getElementById('queryTime').textContent = queryTime;
                 document.getElementById('stats').style.display = 'flex';
                 
-                showMessage(`✅ ${provinceName} ili: ${mappedCount} konum haritada gösterildi`, 'success');
+                showMessage(`✅ ${locationName}: ${mappedCount} konum haritada gösterildi`, 'success');
                 
             } catch (error) {
                 console.error('Sorgu hatası:', error);
