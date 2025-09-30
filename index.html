@@ -754,8 +754,9 @@ LIMIT 100`;
                             });
                             
                             // Popup içeriği
-                            let popupContent = `<div style="max-width: 300px;">`;
-                            popupContent += `<h4 style="margin: 0 0 10px 0; color: #006699;">${label}</h4>`;
+let popupContent = `<div style="max-width: 300px;">`;
+popupContent += `<h4 style="margin: 0 0 10px 0; color: #006699; display: inline-block;">${label}</h4>`;
+popupContent += `<button class="copy-btn" onclick="copyToClipboard('${label}', this)">Kopyala</button>`;
                             
                             if (category === 'openstreetmap') {
                                 if (hasOsmData && osmUrl && osmId) {
@@ -770,7 +771,8 @@ LIMIT 100`;
                             }
                             
                             popupContent += `<p><strong>Konum:</strong> ${locationName}</p>`;
-                            popupContent += `<p><strong>Wikidata:</strong> <a href="${itemUrl}" target="_blank" style="color: #006699;">${qid}</a></p>`;
+popupContent += `<p><strong>Wikidata:</strong> <a href="${itemUrl}" target="_blank" style="color: #006699;">${qid}</a></p>`;
+popupContent += `<div class="clickable-wikidata" onclick="copyToClipboard('wikidata=${qid}', this)">wikidata=${qid}</div>`;
                             
                             // Diğer bağlantılar bölümü
                             popupContent += `<div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee;">`;
